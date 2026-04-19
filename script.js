@@ -2,12 +2,47 @@
 const API_URL = "https://69e4d975cfa9394db8da7144.mockapi.io/tasks"; 
 
 // --- 2. DỮ LIỆU CỐ ĐỊNH ---
+// 1. Cập nhật dữ liệu (Bích điền đúng MSSV của các bạn vào nhé)
 const team = [
-    { name: "Diệu Hân", role: "Trưởng nhóm / Front-end Developer", img: "assets/han.jpg" },
-    { name: "Ngọc Bích", role: "Front-end Developer", img: "assets/bich.jpg" },
-    { name: "Trọng Tuấn", role: "Front-end Developer", img: "assets/tuan.png" },
-    { name: "Anh Khoa", role: "Front-end Developer", img: "assets/khoa.jpg" }
+    { name: "Diệu Hân", id: "PS12345", major: "Lập trình Web", role: "Leader | Front-End Developer ", img: "assets/han.jpg" },
+    { name: "Ngọc Bích", id: "PS23456", major: "Lập trình Web", role: "Front-End Developer", img: "assets/bich.jpg" },
+    { name: "Trọng Tuấn", id: "PS34567", major: "Lập trình Web", role: "Front-End Developer", img: "assets/tuan.png" },
+    { name: "Anh Khoa", id: "PS45678", major: "Lập trình Web", role: "Front-End Developer", img: "assets/khoa.jpg" }
 ];
+
+// 2. Cập nhật hàm render
+function renderMembers() {
+    const list = document.getElementById('member-list');
+    if (!list) return;
+
+    // Render 4 box thành viên
+    const membersHtml = team.map(m => `
+        <div class="member-card">
+            <img src="${m.img}" class="member-avatar">
+            <div class="member-info">
+                <h3 style="margin: 0; font-size: 17px;">${m.name}</h3>
+                <div class="member-id">MSSV: ${m.id}</div>
+                <div class="member-major">${m.major}</div>
+                <p style="margin-top: 8px; font-size: 12px; color: #94a3b8;">${m.role}</p>
+            </div>
+        </div>
+    `).join('');
+
+    // Thêm phần giới thiệu nhóm ở cuối
+    const introHtml = `
+        <div class="team-intro">
+            <h3 style="margin-top:0; color:#1e293b;">🎯 Về NextTech - Nhóm 4</h3>
+            <p style="color:#475569; line-height:1.6; font-size: 14px;">
+                Chúng mình là những sinh viên chuyên ngành Công nghệ thông tin đến từ trường 
+                <strong>FPT Polytechnic</strong>. Với niềm đam mê lập trình và sáng tạo, 
+                nhóm 4 được thành lập để cùng nhau thực hiện các dự án web hiện đại, 
+                tối ưu trải nghiệm người dùng. "NextTech" thể hiện mong muốn tiếp cận các công nghệ mới nhất.
+            </p>
+        </div>
+    `;
+
+    list.innerHTML = membersHtml + introHtml;
+}
 
 const ADMINS = ["Diệu Hân", "Ngọc Bích", "Quản trị viên"];
 let currentTaskProofId = null;
@@ -189,19 +224,27 @@ function renderButtons(task) {
 
 // --- 6. XỬ LÝ ẢNH & MODAL ---
 
+// --- 6. XỬ LÝ ẢNH & MODAL ---
+
 window.openProofModal = (id) => {
     currentTaskProofId = id;
     tempSelectedFiles = [];
     const preview = document.getElementById('preview-container');
+    const fileInput = document.getElementById('proof-input');
+    
     if (preview) preview.innerHTML = "";
+    if (fileInput) fileInput.value = ""; // Reset input file để chọn lại ảnh cũ vẫn được
+    
     document.getElementById('proof-modal').style.display = 'flex';
+    console.log("Đang mở Modal cho Task ID:", id);
 };
 
 window.closeProofModal = () => {
     document.getElementById('proof-modal').style.display = 'none';
+    currentTaskProofId = null; // Xóa ID tạm để tránh nộp nhầm task
 };
 
-// Xử lý nộp ảnh (Chuyển thành Base64)
+// Xử lý nộp ảnh (Dùng sự kiện trực tiếp để ổn định hơn)
 document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'proof-input') {
         const files = e.target.files;
@@ -210,12 +253,20 @@ document.addEventListener('change', function(e) {
         tempSelectedFiles = [];
 
         Array.from(files).forEach(file => {
+            // Kiểm tra dung lượng ảnh (MockAPI giới hạn kích thước dữ liệu Base64)
+            if (file.size > 500000) { // Giới hạn ~500KB để tránh lỗi server
+                alert(`Ảnh ${file.name} quá lớn, hãy chọn ảnh dưới 500KB!`);
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (ev) => {
-                tempSelectedFiles.push(ev.target.result);
+                const base64Image = ev.target.result;
+                tempSelectedFiles.push(base64Image);
+                
                 const img = document.createElement('img');
-                img.src = ev.target.result;
-                img.style.cssText = "width:50px; height:50px; object-fit:cover; margin-right:5px; border-radius:4px;";
+                img.src = base64Image;
+                img.style.cssText = "width:60px; height:60px; object-fit:cover; margin-right:5px; border-radius:6px; border: 1px solid #ddd;";
                 preview?.appendChild(img);
             };
             reader.readAsDataURL(file);
@@ -223,13 +274,18 @@ document.addEventListener('change', function(e) {
     }
 });
 
-// Sửa lỗi nút nộp: Dùng ID chuẩn và Fetch chuẩn
+// Xử lý sự kiện click Xác nhận nộp (Gắn một lần duy nhất)
 document.addEventListener('DOMContentLoaded', () => {
     const confirmBtn = document.getElementById('confirm-proof-btn');
     if (confirmBtn) {
         confirmBtn.onclick = async () => {
-            if (tempSelectedFiles.length === 0) return alert("Vui lòng chọn ảnh!");
+            // Kiểm tra các điều kiện trước khi nộp
+            if (!currentTaskProofId) return alert("Lỗi: Không tìm thấy ID công việc!");
+            if (tempSelectedFiles.length === 0) return alert("Vui lòng chọn ít nhất 1 ảnh minh chứng!");
             
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = "Đang gửi...";
+
             try {
                 const res = await fetch(`${API_URL}/${currentTaskProofId}`, {
                     method: 'PUT',
@@ -240,11 +296,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         feedback: ""
                     })
                 });
+
                 if(res.ok) {
+                    alert("Nộp bài thành công! Task đã được chuyển sang Chờ kiểm thử.");
                     closeProofModal();
                     getTasks();
-                } else { alert("Lỗi server! Hãy thử lại."); }
-            } catch (err) { console.error("Lỗi nộp bài:", err); }
+                } else { 
+                    const errorMsg = await res.text();
+                    console.error("Lỗi server:", errorMsg);
+                    alert("Lỗi server (Có thể do ảnh quá nặng)! Hãy thử ảnh nhẹ hơn."); 
+                }
+            } catch (err) { 
+                console.error("Lỗi kết nối:", err);
+                alert("Không thể kết nối với server!");
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = "Xác nhận nộp";
+            }
         };
     }
 });
@@ -261,16 +329,35 @@ window.rejectTask = async function(id) {
     }
 }
 
+// Hàm render lại thành viên theo đúng yêu cầu 4 box hàng ngang
 function renderMembers() {
     const list = document.getElementById('member-list');
     if (!list) return;
-    list.innerHTML = team.map(m => `
-        <div class="member-card" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <img src="${m.img}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+
+    const membersHtml = team.map(m => `
+        <div class="member-card">
+            <img src="${m.img}" class="member-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${m.name}'">
             <div class="member-info">
-                <h3 style="margin: 0; font-size: 16px;">${m.name}</h3>
-                <p style="margin: 5px 0 0; color: #64748b; font-size: 13px;">${m.role}</p>
+                <h3 style="margin: 0; font-size: 17px; color: #1e293b;">${m.name}</h3>
+                <div class="member-id" style="font-size: 13px; color: #64748b; margin-top: 5px;">MSSV: ${m.id}</div>
+                <div class="member-major" style="display: inline-block; font-size: 12px; color: #3b82f6; background: #eff6ff; padding: 2px 8px; border-radius: 4px; margin-top: 5px;">${m.major}</div>
+                <p style="margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 500;">${m.role}</p>
             </div>
         </div>
     `).join('');
+
+    const introHtml = `
+        <div class="team-intro" style="grid-column: 1 / -1; background: #f8fafc; padding: 25px; border-radius: 16px; border-left: 5px solid #3b82f6; margin-top: 20px;">
+            <h3 style="margin-top:0; color:#1e293b;">🎯 Về NextTech - Team</h3>
+            <p style="color:#475569; line-height:1.6; font-size: 14px;">
+                Chúng mình là những sinh viên chuyên ngành <strong>${team[0].major}</strong> đến từ trường 
+                <strong>FPT Polytechnic</strong>. <br>
+                Với niềm đam mê lập trình và sáng tạo, 
+                NextTech - Team được thành lập để cùng nhau thực hiện website Quản Lý DATN-2026 nhằm mục đích để theo dõi tiến độ của nhóm.<br>
+                Hi vọng nhóm sẽ đạt được thành tích tốt và sẽ vượt qua DATN cuối môn này tốt đẹp.<br>
+            </p>
+        </div>
+    `;
+
+    list.innerHTML = membersHtml + introHtml;
 }
