@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - Project Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-box">
+        <div class="login-logo">O</div>
+        <h2>Hệ thống Quản lý</h2>
+        <div class="input-group-login">
+            <label>Tên đăng nhập</label>
+            <input type="text" id="username" placeholder="user">
+        </div>
+        <div class="input-group-login">
+            <label>Mật khẩu</label>
+            <input type="password" id="password" placeholder="password">
+        </div>
+        <button class="btn-login" onclick="checkLogin()">Đăng nhập</button>
+        <p id="error-msg" class="error-text"></p>
+    </div>
+
+    <script>
+        const USERS = [
+            { user: "quangtrongtuan", pass: "1111", name:"Trọng Tuấn" },
+            { user: "ngocbich", pass: "2222", name:"Ngọc Bích" },
+            { user: "nguyendieuhan", pass: "3333", name:"Diệu Hân"},
+            { user: "trananhkhoa", pass: "4444", name:"Anh Khoa" }
+        ];
+
+        function checkLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            const found = USERS.find(item => item.user === u && item.pass === p);
+            
+            if (found) {
+                localStorage.setItem('isLoggedIn', 'true');
+                // Lưu tên đầy đủ để hiển thị lời chào 
+                localStorage.setItem('currentUser', found.name); 
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+</body>
+</html>
