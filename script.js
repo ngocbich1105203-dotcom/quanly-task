@@ -3,10 +3,10 @@ const API_URL = "https://69e4d975cfa9394db8da7144.mockapi.io/tasks";
 
 // --- 2. DỮ LIỆU CỐ ĐỊNH ---
 const team = [
-    { name: "Diệu Hân", role: "Trưởng nhóm / Front-end Developer", img: "https://i.pravatar.cc/150?u=han" },
-    { name: "Ngọc Bích", role: "Front-end Developer", img: "https://i.pravatar.cc/150?u=bich" },
-    { name: "Trọng Tuấn", role: "Front-end Developer", img: "https://i.pravatar.cc/150?u=tuan" },
-    { name: "Anh Khoa", role: "Front-end Developer", img: "https://i.pravatar.cc/150?u=khoa" }
+    { name: "Diệu Hân", role: "Trưởng nhóm / Front-end Developer", img: "assets/han.jpg" },
+    { name: "Ngọc Bích", role: "Front-end Developer", img: "assets/bich.jpg" },
+    { name: "Trọng Tuấn", role: "Front-end Developer", img: "assets/tuan.png" },
+    { name: "Anh Khoa", role: "Front-end Developer", img: "assets/khoa.jpg" }
 ];
 
 const ADMINS = ["Diệu Hân", "Ngọc Bích", "Quản trị viên"];
