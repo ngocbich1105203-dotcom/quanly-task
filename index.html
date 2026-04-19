@@ -89,15 +89,19 @@
     <div id="proof-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h3>Nộp minh chứng công việc</h3>
-            <p style="font-size:12px; color:gray;">Chọn một hoặc nhiều ảnh minh chứng</p>
+            <p style="font-size:12px; color:gray; margin-bottom: 15px;">Chọn một hoặc nhiều ảnh minh chứng</p>
             
-            <input type="file" id="proof-input" accept="image/*" multiple style="margin: 15px 0; width: 100%;">
+            <input type="file" id="proof-input" accept="image/*" multiple style="margin-bottom: 15px; width: 100%;">
             
-            <div id="preview-container" style="display:flex; gap:5px; margin-bottom:15px; flex-wrap:wrap;"></div>
+            <div id="preview-container" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; min-height: 50px;"></div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button onclick="closeProofModal()">Hủy</button>
-                <button id="confirm-proof-btn" class="btn-primary">Xác nhận nộp</button>
+            <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="closeProofModal()" style="padding: 8px 20px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer;">
+                    Hủy
+                </button>
+                <button type="button" id="confirm-proof-btn" style="padding: 8px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    Xác nhận nộp
+                </button>
             </div>
         </div>
     </div>
